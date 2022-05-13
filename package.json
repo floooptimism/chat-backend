@@ -2,9 +2,11 @@
   "name": "chat-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "mocha"
+    "start": "node src/app.js",
+    "test": "mocha",
+    "doc": "jsdoc -c jsdoc.json"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +17,10 @@
     "socket.io-client": "^4.5.0"
   },
   "devDependencies": {
+    "better-docs": "^2.7.2",
     "chai": "^4.3.6",
-    "mocha": "^10.0.0"
+    "jsdoc": "^3.6.10",
+    "mocha": "^10.0.0",
+    "node-file-logger": "^0.9.5"
   }
 }
