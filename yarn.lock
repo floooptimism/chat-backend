@@ -701,6 +701,11 @@ concat-map@0.0.1:
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=
 
+console-log-colors@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/console-log-colors/-/console-log-colors-0.2.3.tgz#ca300616b5c249cc1269498cc521ec1f808f5031"
+  integrity sha512-KAGsePEunvs575RFAIThR7sUBVuqXU0Y2tckA99k25itVAOa0hPwf3HkNVyQ7XnbisKvTp/gLnByjG9NTYt3hw==
+
 constantinople@^3.0.1, constantinople@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/constantinople/-/constantinople-3.1.2.tgz#d45ed724f57d3d10500017a7d3a889c1381ae647"
