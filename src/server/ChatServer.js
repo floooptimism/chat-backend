@@ -25,18 +25,19 @@ class ChatServer{
         this.rooms.set(roomID, roomName);
     }
 
-    removeUserFromRoom(socket, roomID) {
-        socket.leave(roomID);
+    removeUserFromCurrentRoom(socket) {
         let user = this.users.get(socket.id);
+        let currentRoom = user.roomID;
         user.roomID = null;
         this.addUser(socket.id, user);
+        socket.leave(currentRoom);
     }
 
     addUserToRoom(socket, roomID){
-        socket.join(roomID);
         let user = this.users.get(socket.id);
         user.roomID = roomID;
         this.addUser(socket.id, user);
+        socket.join(roomID);
     }
 
 
@@ -47,20 +48,22 @@ class ChatServer{
         this.io.on('connection', (socket) => {
             // listeners
             console.log("Someone connected.");
-            self.addUser(socket.id, {});
+            self.addUser(socket.id, {username: socket.handshake.query.username, roomID: null});
 
             socket.on("message_to_room", function(data){
                 let user = self.users.get(socket.id);
-                self.io.to(user.roomID).emit("message_from_room", data);
+                if(!self.rooms.get(user.roomID)) return;
+                self.io.to(user.roomID).emit("message_from_room", {user: data.user, message: data.message});
             })
 
             socket.on("join_room", function(data){
-                let user = self.users.get(socket.id);
-                user.roomID = data.roomID;
-                self.addUser(socket.id, user);
+                self.removeUserFromCurrentRoom(socket);
+                self.addUserToRoom(socket, data.roomID);
+                console.log(Array.from(self.users.values()));
             })
 
             socket.on("disconnect", () => {
+                self.removeUserFromCurrentRoom(socket);
                 self.removeUser(socket.id);
             })
         });
@@ -77,13 +80,19 @@ class ChatServer{
         this.io.sockets.adapter.on('join-room', function(room, id){
             console.log("Joining room: " + room);
             let users = Array.from(self.users.values()).filter(user => user.roomID === room);
-            self.io.emit("room_joined", users);
+            self.io.to(room).emit("joined_room", {
+                users: users,
+                user: self.users.get(id) && self.users.get(id).username,
+            });
         })
 
         this.io.sockets.adapter.on('leave-room', function(room, id){
             console.log("Leaving room: " + room);
             let users = Array.from(self.users.values()).filter(user => user.roomID === room);
-            self.io.emit("room_joined", users);
+            self.io.to(room).emit("left_room", {
+                users: users,
+                user: self.users.get(id) && self.users.get(id).username
+            });
         })
     }
 
