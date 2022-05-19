@@ -50,15 +50,15 @@ class ChatServer{
             console.log("Someone connected.");
             self.addUser(socket.id, {username: socket.handshake.query.username, roomID: null});
 
-            socket.on("message_to_room", function(data){
+            socket.on("message_to_room", function({message}){
                 let user = self.users.get(socket.id);
                 if(!self.rooms.get(user.roomID)) return;
-                self.io.to(user.roomID).emit("message_from_room", {user: data.user, message: data.message});
+                self.io.to(user.roomID).emit("message_from_room", {user: user.username, message: message});
             })
 
-            socket.on("join_room", function(data){
+            socket.on("join_room", function({roomID}){
                 self.removeUserFromCurrentRoom(socket);
-                self.addUserToRoom(socket, data.roomID);
+                self.addUserToRoom(socket, roomID);
                 console.log(Array.from(self.users.values()));
             })
 
@@ -82,16 +82,16 @@ class ChatServer{
             let users = Array.from(self.users.values()).filter(user => user.roomID === room);
             self.io.to(room).emit("joined_room", {
                 users: users,
-                user: self.users.get(id) && self.users.get(id).username,
+                newUser: self.users.get(id) && self.users.get(id).username,
             });
         })
 
-        this.io.sockets.adapter.on('leave-room', function(room, id){
+        this.io.sockets.adapter.on('leave-room', function(room, IDOfUserThatLeft){
             console.log("Leaving room: " + room);
             let users = Array.from(self.users.values()).filter(user => user.roomID === room);
             self.io.to(room).emit("left_room", {
                 users: users,
-                user: self.users.get(id) && self.users.get(id).username
+                userThatLeft: self.users.get(IDOfUserThatLeft) && self.users.get(IDOfUserThatLeft).username
             });
         })
     }
