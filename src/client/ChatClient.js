@@ -18,9 +18,9 @@ class ChatClient{
         /** @property {string} token - Client token for authentication to the socket server */
         this.token = token;
         /** @property {Array} rooms_list - Stores all the current rooms the socket server has */
-        this.rooms_list = [];
-        /** @property {Array} room_users - Stores all the users in the current room the client is in  */
-        this.room_users = [];
+        this.rooms = [];
+        /** @property {Array} usersInRoom - Stores all the users in the current room the client is in  */
+        this.usersInRoom = [];
         /** @property {string} url - URL of the socket server */
         this.url = url;
 
@@ -41,6 +41,14 @@ class ChatClient{
 
         /** @property {Boolean} connected - Indicates if the client is connnected or not */
         this.connected = false;
+    }
+
+    updateRooms(rooms){
+        this.rooms = rooms;
+    }
+
+    updateUsersInRoom(users){
+        this.usersInRoom = users;
     }
 
     /**
@@ -64,25 +72,25 @@ class ChatClient{
         });
         this.io.on('connect_error', fail || function(){});
 
-        this.io.on('message_from_room', function (data){
-            console.log(log.yellow(`${data.user}: ${data.message}`));
-            self.notifySubscribers('message_from_room', data);
+        this.io.on('message_from_room', function ({user, message}){
+            console.log(log.yellow(`${user}: ${message}`));
+            self.notifySubscribers('message_from_room', {user, message});
         });
         this.io.on('rooms_list', function (rooms){
-            self.rooms_list = rooms;
+            self.updateRooms(rooms);
             self.notifySubscribers('rooms_list', rooms);
         });
 
-        this.io.on('joined_room', function(data){
-            self.room_users = data.users;
-            console.log(log.green(`${data.user} has joined the room.`));
-            self.notifySubscribers('joined_room', data);
+        this.io.on('joined_room', function({users, newUser}){
+            self.updateUsersInRoom(users);
+            console.log(log.green(`${newUser} has joined the room.`));
+            self.notifySubscribers('joined_room', {users, newUser});
         });
 
-        this.io.on('left_room', function(data){
-            self.room_users = data.users;
-            console.log(log.green(`${data.user} has left the room.`));
-            self.notifySubscribers('left_room', data);
+        this.io.on('left_room', function({users, userThatLeft}){
+            self.updateUsersInRoom(users);
+            console.log(log.green(`${userThatLeft} has left the room.`));
+            self.notifySubscribers('left_room', {users, userThatLeft});
         });
     }
 
@@ -92,7 +100,6 @@ class ChatClient{
      */
     sendMessage(message){
         this.io.emit('message_to_room', {
-            user: this.username,
             message: message
         });
     }
