@@ -42,7 +42,12 @@ class ChatServer{
 
 
     start(httpServer){
-        this.io = new Server(httpServer);
+        this.io = new Server(httpServer, {
+            cors: {
+                origin: "*",
+                methods: ["GET", "POST"]
+            }
+        });
         let self = this;
 
         this.io.on('connection', (socket) => {
@@ -59,7 +64,7 @@ class ChatServer{
             socket.on("join_room", function({roomID}){
                 self.removeUserFromCurrentRoom(socket);
                 self.addUserToRoom(socket, roomID);
-                console.log(Array.from(self.users.values()));
+                socket.emit('join_room_success', {roomID});
             })
 
             socket.on("disconnect", () => {
