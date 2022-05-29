@@ -64,8 +64,7 @@ class ChatServer{
 
             socket.on("message_to_room", function({message}){
                 let user = self.users.get(socket.id);
-                if(!self.rooms.get(user.roomID)) return;
-                self.io.to(user.roomID).emit("message_from_room", {user: user.username, message: message});
+                self.io.to(user.roomID).emit("message_from_room", {id: generateID()+messageTimestamp, user: user.username, message: message, timestamp: messageTimestamp});
             })
 
             socket.on("join_room", function({roomID}){
