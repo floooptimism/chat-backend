@@ -67,10 +67,10 @@ class ChatServer{
                 self.io.to(user.roomID).emit("message_from_room", {id: generateID()+messageTimestamp, user: user.username, message: message, timestamp: messageTimestamp});
             })
 
-            socket.on("join_room", function({roomID}){
+            socket.on("join_room", function({room}){
                 self.removeUserFromCurrentRoom(socket);
-                self.addUserToRoom(socket, roomID);
-                socket.emit('join_room_success', {roomID});
+                self.addUserToRoom(socket, room.channelId);
+                socket.emit('join_room_success', {room});
             })
 
             socket.on("disconnect", () => {
