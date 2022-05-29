@@ -1,5 +1,10 @@
 const { Server } = require('socket.io');
 const validateToken = require('./middlewares/validateToken');
+const uid = require('uid2');
+
+function generateID(){
+    return uid(32);
+}
 
 class ChatServer{
     constructor(){
