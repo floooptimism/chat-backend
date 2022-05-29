@@ -59,8 +59,7 @@ class ChatServer{
         this.io.on('connection', (socket) => {
             // listeners
             console.log("Someone connected.");
-            console.log(socket.data);
-            self.addUser(socket.id, {username: socket.handshake.query.username, roomID: null});
+            self.addUser(socket.id, {username: socket.data.username, roomID: null});
 
             socket.on("message_to_room", function({message}){
                 let user = self.users.get(socket.id);
