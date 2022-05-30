@@ -2,6 +2,7 @@
 const { createServer }  = require('http');
 const express = require('express');
 const ChatServer = require('./server/ChatServer');
+const port = process.env.PORT || 3001;
 
 const cors = require('cors');
 const app = express();
@@ -15,8 +16,8 @@ const chatServer = new ChatServer();
 // Socket IO Server
 chatServer.start(server);
 
-server.listen(3001, () => {
-    console.log('listening on port 3000');
+server.listen(process.env.PORT || , () => {
+    console.log(`Listening on port: ${port}`);
 });
 
 
