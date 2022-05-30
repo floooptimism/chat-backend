@@ -1,5 +1,6 @@
 const jose = require('jose');
-let key = Buffer.from("c47dc077-7464-4618-926e-49fdecf3cdbe");
+
+let key = Buffer.from(process.env.JWT_SECRET || "c47dc077-7464-4618-926e-49fdecf3cdbe");
 
 async function validateToken(socket, next){
     try{
