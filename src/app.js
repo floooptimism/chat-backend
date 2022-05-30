@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
     res.send("Hello World");
 })
 
-server.listen(process.env.PORT || , () => {
+server.listen(port, () => {
     console.log(`Listening on port: ${port}`);
 });
 
