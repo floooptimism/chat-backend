@@ -16,6 +16,12 @@ const chatServer = new ChatServer();
 // Socket IO Server
 chatServer.start(server);
 
+
+// hello world repsond
+app.get("/", (req, res) => {
+    res.send("Hello World");
+})
+
 server.listen(process.env.PORT || , () => {
     console.log(`Listening on port: ${port}`);
 });
