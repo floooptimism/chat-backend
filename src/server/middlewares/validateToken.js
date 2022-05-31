@@ -7,7 +7,8 @@ async function validateToken(socket, next){
         let token = socket.handshake.auth.token;
         const {payload, header} = await jose.jwtVerify(token, key)
         socket.data = {
-            username: payload.user_metadata.full_name
+            username: payload.user_metadata.full_name,
+            profile_picture: payload.user_metadata.avatar_url
         }
         next();
     }catch(err){
