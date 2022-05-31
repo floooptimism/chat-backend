@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "echo 'no test files'`",
+    "test": "echo 'no test files'",
     "doc": "jsdoc -c jsdoc.json"
   },
   "keywords": [],
