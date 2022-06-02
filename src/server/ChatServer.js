@@ -101,7 +101,7 @@ class ChatServer {
     // Adapters listeners
     this.io.sockets.adapter.on("create-room", function (room) {
       console.log("Creating room: " + room);
-      self.io.emit("rooms_list", Array.from(self.rooms.values()));
+      self.io.emit("update_rooms", Array.from(self.rooms.values()));
     });
 
     this.io.sockets.adapter.on("join-room", function (room, id) {
