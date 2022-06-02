@@ -33,6 +33,7 @@ class ChatServer {
   removeUserFromCurrentRoom(socket) {
     let user = this.users.get(socket.id);
     let currentRoom = user.roomID;
+    this.io.to(currentRoom).emit("message_from_server", {message: `${user.username} has left the room`, timestamp: Date.now()});
     user.roomID = null;
     this.addUser(socket.id, user);
     socket.leave(currentRoom);
