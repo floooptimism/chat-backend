@@ -105,6 +105,7 @@ class ChatServer {
     });
 
     this.io.sockets.adapter.on("join-room", function (room, id) {
+      if(!self.rooms.get(room)) return;
       console.log("Joining room: " + room);
       let users = Array.from(self.users.values()).filter(
         (user) => user.roomID === room
@@ -113,6 +114,11 @@ class ChatServer {
         users: users,
         newUser: self.users.get(id) && self.users.get(id).username,
       });
+
+      // this makes the "join_room_success" emit first
+      setTimeout(() => {
+        self.io.to(room).emit("message_from_server", {message: `${self.users.get(id).username} has joined the room`, timestamp: Date.now()});
+      }, 0);
     });
 
     this.io.sockets.adapter.on("leave-room", function (room, IDOfUserThatLeft) {
