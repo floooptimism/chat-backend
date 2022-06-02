@@ -65,6 +65,9 @@ class ChatServer {
         roomID: null,
       });
 
+      // send rooms
+      socket.emit("update_rooms", Array.from(self.rooms.values()));
+
       socket.on("message_to_room", function ({ message }) {
         let user = self.users.get(socket.id);
         let messageTimestamp = Date.now();
