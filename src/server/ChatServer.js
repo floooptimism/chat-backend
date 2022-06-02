@@ -26,8 +26,8 @@ class ChatServer {
     this.users.delete(id);
   }
 
-  addRoom(roomID, roomName) {
-    this.rooms.set(roomID, roomName);
+  addRoom(roomID, roomMeta) {
+    this.rooms.set(roomID, roomMeta);
   }
 
   removeUserFromCurrentRoom(socket) {
@@ -71,7 +71,7 @@ class ChatServer {
       socket.on("message_to_room", function ({ message }) {
         let user = self.users.get(socket.id);
         let messageTimestamp = Date.now();
-        // if(!self.rooms.get(user.roomID)) return;
+        
         self.io.to(user.roomID).emit("message_from_room", {
           id: generateID() + messageTimestamp,
           user: {
@@ -85,7 +85,7 @@ class ChatServer {
 
       socket.on("join_room", function ({ room }) {
         self.removeUserFromCurrentRoom(socket);
-        self.addUserToRoom(socket, room.channelId);
+        self.addUserToRoom(socket, room.id);
         socket.emit("join_room_success", { room });
       });
 
@@ -133,6 +133,7 @@ class ChatServer {
           self.users.get(IDOfUserThatLeft).username,
       });
     });
+
   }
 
   stop() {
