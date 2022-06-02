@@ -123,6 +123,7 @@ class ChatServer {
 
     this.io.sockets.adapter.on("leave-room", function (room, IDOfUserThatLeft) {
       console.log("Leaving room: " + room);
+      if(!self.rooms.get(room)) return;
       let users = Array.from(self.users.values()).filter(
         (user) => user.roomID === room
       );
