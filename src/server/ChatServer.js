@@ -54,25 +54,24 @@ class ChatServer {
         methods: ["GET", "POST"],
       },
     });
-    let self = this;
 
     this.io.on("connection", (socket) => {
       // listeners
       console.log("Someone connected.");
-      self.addUser(socket.id, {
+      this.addUser(socket.id, {
         username: socket.data.username,
         profile_picture: socket.data.profile_picture,
         roomID: null,
       });
 
       // send rooms
-      socket.emit("update_rooms", Array.from(self.rooms.values()));
+      socket.emit("update_rooms", Array.from(this.rooms.values()));
 
-      socket.on("message_to_room", function ({ message }) {
-        let user = self.users.get(socket.id);
+      socket.on("message_to_room", ({ message }) => {
+        let user = this.users.get(socket.id);
         let messageTimestamp = Date.now();
         
-        self.io.to(user.roomID).emit("message_from_room", {
+        this.io.to(user.roomID).emit("message_from_room", {
           id: generateID() + messageTimestamp,
           user: {
             name: user.username,
@@ -83,15 +82,15 @@ class ChatServer {
         });
       });
 
-      socket.on("join_room", function ({ room }) {
-        self.removeUserFromCurrentRoom(socket);
-        self.addUserToRoom(socket, room.id);
+      socket.on("join_room", ({ room }) => {
+        this.removeUserFromCurrentRoom(socket);
+        this.addUserToRoom(socket, room.id);
         socket.emit("join_room_success", { room });
       });
 
       socket.on("disconnect", () => {
-        self.removeUserFromCurrentRoom(socket);
-        self.removeUser(socket.id);
+        this.removeUserFromCurrentRoom(socket);
+        this.removeUser(socket.id);
       });
     });
 
@@ -99,38 +98,38 @@ class ChatServer {
     this.io.use(validateToken);
 
     // Adapters listeners
-    this.io.sockets.adapter.on("create-room", function (room) {
+    this.io.sockets.adapter.on("create-room", (room) => {
       console.log("Creating room: " + room);
-      self.io.emit("update_rooms", Array.from(self.rooms.values()));
+      this.io.emit("update_rooms", Array.from(this.rooms.values()));
     });
 
-    this.io.sockets.adapter.on("join-room", function (room, id) {
-      if(!self.rooms.get(room)) return;
+    this.io.sockets.adapter.on("join-room", (room, id) => {
+      if(!this.rooms.get(room)) return;
       console.log("Joining room: " + room);
-      let users = Array.from(self.users.values()).filter(
+      let users = Array.from(this.users.values()).filter(
         (user) => user.roomID === room
       );
-      self.io.to(room).emit("other_user_joined_room", {
+      this.io.to(room).emit("other_user_joined_room", {
         users: users,
-        newUser: self.users.get(id) && self.users.get(id).username,
+        newUser: this.users.get(id) && this.users.get(id).username,
       });
 
       // this makes the "join_room_success" emit first
       setTimeout(() => {
-        self.io.to(room).emit("message_from_server", {message: `${self.users.get(id).username} has joined the room`, timestamp: Date.now()});
+        this.io.to(room).emit("message_from_server", {message: `${this.users.get(id).username} has joined the room`, timestamp: Date.now()});
       }, 0);
     });
 
-    this.io.sockets.adapter.on("leave-room", function (room, IDOfUserThatLeft) {
-      if(!self.rooms.get(room)) return;
-      let users = Array.from(self.users.values()).filter(
+    this.io.sockets.adapter.on("leave-room", (room, IDOfUserThatLeft) => {
+      if(!this.rooms.get(room)) return;
+      let users = Array.from(this.users.values()).filter(
         (user) => user.roomID === room
       );
-      self.io.to(room).emit("other_user_left_room", {
+      this.io.to(room).emit("other_user_left_room", {
         users: users,
         userThatLeft:
-          self.users.get(IDOfUserThatLeft) &&
-          self.users.get(IDOfUserThatLeft).username,
+          this.users.get(IDOfUserThatLeft) &&
+          this.users.get(IDOfUserThatLeft).username,
       });
     });
 
